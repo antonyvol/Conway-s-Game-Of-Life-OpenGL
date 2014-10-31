@@ -1,14 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-#include "GLWidget.h"
-
-#include <QGLWidget>
-
-#include<GL/gl.h>
+#include <GLWidget.h>
 
 QTimer* mainTimer;
-
 GLWidget * mainThread;
 
 //>>>>>>>>>>>>>>>>>>>>>>>CONSTRUCTOR>>>>>>>>>>>>>>>>>>>
@@ -64,68 +58,62 @@ void MainWindow::on_startButton_clicked()
 }
 
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>TABLE DOUBLE CLICKING>>>>>>>>>>>>>>>>>>>>>>>
-/// :   Some function for add a new 'live' in cell
-void MainWindow::on_tableWidget_doubleClicked(const QModelIndex &index)
-{
-//    if(ui->tableWidget->item(index.row(),index.column())->text() == "#")
-//        ui->tableWidget->setItem(index.row(), index.column(), new QTableWidgetItem(" "));
-//    else
-//        ui->tableWidget->setItem(index.row(), index.column(), new QTableWidgetItem("#"));
-
-}
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>CHANGE TIMER STEP>>>>>>>>>>>>>>>>>>>>
 void MainWindow::on_timerStepSlider_valueChanged(int value)
 {
-//    mainTimer->stop();
-//    timerStep = value;
-//    mainTimer->start(value);
+    ui->label->setText("Time step: " + QString::number(value));
+    mainTimer->stop();
+    mainTimer->start(value);
 }
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RESET>>>>>>>>>>>>>>>>>>>>>>>>>>>
 void MainWindow::on_resetButton_clicked()
 {
-//    wcnt = 0;
-//    for(int i = 0; i < Rows; i++) {
-//        for(int j = 0; j < Cols; j++) {
-//            buffer[i][j] = ' ';
-//            ui->tableWidget->setItem(i, j, new QTableWidgetItem(" "));
-//        }
-//    }
+    for(int i = 0; i < Rows; i++)
+        for(int j = 0; j < Cols; j++)
+        {
+             mainThread->buffer[i][j] = false;
+             mainThread->current[i][j] = false;
+        }
 }
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RANDOM FILL OF SELECTED AREA>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 void MainWindow::on_randomButton_clicked()
 {
-//    QList<QTableWidgetItem*> items = ui->tableWidget->selectedItems();
-//    for(int i = 0; i < items.count(); ++i) {
-//        int random = rand()%2;
-//        if(mainTimer->isActive()) {
-//            if(random)
-//                buffer[items.at(i)->row()][items.at(i)->column()] = '#';
-//        }
-//        else {
-//            if(random)
-//                ui->tableWidget->setItem(items.at(i)->row(), items.at(i)->column(), new QTableWidgetItem("#"));
-//        }
-//    }
-//    ui->tableWidget->clearSelection();
+    int random = 0;
+
+    for(int i = mainThread->getMin(mainThread->startSelection->x(), mainThread->endSelection->x()); i < mainThread->getMax(mainThread->startSelection->x(), mainThread->endSelection->x()); i++)
+    {
+        for(int j = mainThread->getMin(mainThread->startSelection->y(), mainThread->endSelection->y()); j < mainThread->getMax(mainThread->startSelection->y(), mainThread->endSelection->y()); j++)
+        {
+            random = rand() %2;
+            mainThread->buffer[i][j] = random;
+        }
+    }
+
+    mainThread->startSelection->setX(0);
+    mainThread->startSelection->setY(0);
+    mainThread->endSelection->setX(0);
+    mainThread->endSelection->setY(0);
 }
 //>>>>>>>>>>>>>>>>>>>>>>>>>>FILL OF SELECTED AREA>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 void MainWindow::on_fillButton_clicked()
 {
-//    QList<QTableWidgetItem*> items = ui->tableWidget->selectedItems();
-//    for(int i = 0; i < items.count(); ++i)
-//        if(mainTimer->isActive())
-//            buffer[items.at(i)->row()][items.at(i)->column()] = '#';
-//        else
-//            ui->tableWidget->setItem(items.at(i)->row(), items.at(i)->column(), new QTableWidgetItem("#"));
-//    ui->tableWidget->clearSelection();
+    for(int i = mainThread->getMin(mainThread->startSelection->x(), mainThread->endSelection->x()); i < mainThread->getMax(mainThread->startSelection->x(), mainThread->endSelection->x()); i++)
+    {
+        for(int j = mainThread->getMin(mainThread->startSelection->y(), mainThread->endSelection->y()); j < mainThread->getMax(mainThread->startSelection->y(), mainThread->endSelection->y()); j++)
+        {
+            mainThread->buffer[i][j] = true;
+        }
+    }
+
+    mainThread->startSelection->setX(0);
+    mainThread->startSelection->setY(0);
+    mainThread->endSelection->setX(0);
+    mainThread->endSelection->setY(0);
 }
 
-    void MainWindow::onTimerTick()
-    {
-        mainThread->onTimerTick();
-        cnt++;
-        ui->label->setText(QString::number(cnt));
-
-        ui->counterLabel->setText(QString("X: ") +QString::number( mainThread->mapFromGlobal(QCursor::pos()).x()) + QString(" Y: ") + QString::number( mainThread->mapFromGlobal(QCursor::pos()).y()));
-    }
+void MainWindow::onTimerTick()
+{
+    mainThread->onTimerTick();
+    cnt++;
+    ui->counterLabel->setText("Time: " + QString::number(cnt));
+}

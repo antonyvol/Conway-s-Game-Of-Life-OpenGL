@@ -31,7 +31,6 @@ private:
 
 private slots:
     void on_startButton_clicked();
-    void on_tableWidget_doubleClicked(const QModelIndex &index);
     void on_timerStepSlider_valueChanged(int value);
     void on_resetButton_clicked();
     void on_randomButton_clicked();
